@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de tareas</title>
+    <style>
+        li {
+            font-family: Belta;
+            font-size: xx-large;
+        }
+
+        h1 {
+            font-family: Belta;
+            font-size: 4em;
+        }
+
+        .tareas {
+            text-align: center;
+            margin-left: 600px;
+        }
+
+        @font-face {
+            font-family: "belta-regular";
+            src: url('belta-regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: bold;
+            font-display: swap;
+        }
+
+        .corazon {
+            list-style-type: none;
+            margin-left: 100px;
+        }
+
+        .imagen {
+            width: 300px;
+            height: auto;
+            margin-left: -50px;
+        }
+
+        body {
+            background-image: url('notebook.jpg');
+            background-repeat: no-repeat;
+            background-size: 900px 900px;
+        }
+
+        .boton {
+            font-size: 24px;
+            padding: 20px 40px;
+            color: black;
+            font-family: Belta;
+            font-size: xx-large;
+            border-radius: 40px;
+            background-color: #F3C4D9;
+        }
+
+        .boton-container {
+            position: fixed;
+            top: 400px;
+            left: 850px;
+        }
+
+        .heart {
+            position: fixed;
+            top: 400px;
+            left: 850px;
+            animation: float 5s linear infinite;
+            opacity: 0;
+            font-size: 48px;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(500px, -500px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<br>
+<br>
+
+<!-- Input para agregar nuevas tareas -->
+<div class="tareas">
+    <h1>LISTA DE TAREAS</h1>
+    <input class="boton" type="text" name="texto" id="texto"><br> <br>
+    <button class="boton" onclick="anadirTarea()">Agregar</button>
+</div>
+
+<!-- Lista de tareas -->
+<ul id="tareas" class="corazon"></ul>
+
+<div class="boton-container">
+    
+    <span id="heartContainer"></span>
+</div>
+
+<script>
+    // Variable que almacena las tareas
+    var listaTareas = [];
+
+    // Elemento de la lista de tareas en el documento HTML
+    var elemTareas = document.getElementById("tareas");
+
+    // Función para añadir una tarea a la lista
+    function anadirTarea() {
+        // Obtiene el texto ingresado en el input
+        var texto = document.getElementById("texto").value;
+
+        // Agrega el texto a la lista de tareas
+        listaTareas.push(texto);
+
+        // Actualiza la lista de tareas en el documento HTML
+        actualizarTareas();
+
+        // Muestra los corazones flotantes
+        mostrarCorazonesFlotantes();
+    }
+
+    // Función para actualizar la lista de tareas en el documento HTML
+    function actualizarTareas() {
+        // Limpia el contenido actual de la lista de tareas
+        elemTareas.innerHTML = "";
+
+        // Recorre la lista de tareas y crea elementos <li> y <input> para cada una
+        for (var i = 0; i < listaTareas.length; i++) {
+            var li = document.createElement("li"); // Crea un elemento <li>
+            var chk = document.createElement("input"); // Crea un elemento <input>
+            chk.setAttribute("type", "checkbox"); // Establece el tipo del input como checkbox
+            chk.addEventListener("change", eliminarElemento);
+            chk.setAttribute("id", i);
+            var t = document.createTextNode(listaTareas[i]); // Crea un nodo de texto con el contenido de la tarea
+            li.appendChild(chk); // Agrega el checkbox al elemento <li>
+
+            var corazon = document.createElement("span"); // Crea un elemento <span> para el corazón
+            corazon.innerHTML = "&#x2665;"; // Establece el símbolo del corazón utilizando el código Unicode
+            corazon.style.marginRight = "5px";
+            corazon.style.color = "black";
+            li.appendChild(corazon); // Agrega el corazón al elemento <li>
+
+            li.appendChild(t); // Agrega el nodo de texto al elemento <li>
+            elemTareas.appendChild(li); // Agrega el elemento <li> a la lista de tareas
+        }
+
+        guardarTareas();
+    }
+
+    function eliminarElemento() {
+        var i = parseInt(event.target.id); // Convertir una cadena a un entero
+        listaTareas.splice(i, 1); // eliminamos un elemento desde la posición i
+        actualizarTareas(); // Regenera la lista
+    }
+
+    function cargarTareas() {
+        listaTareas = JSON.parse(localStorage.getItem("tareas")); // recuperas el valor del JSON
+        if (listaTareas == null) {
+            listaTareas = [];
+        }
+    }
+
+    function guardarTareas() {
+        localStorage.setItem("tareas", JSON.stringify(listaTareas)); // conviertes la lista
+    }
+
+    function mostrarMensaje() {
+        var r = Math.floor(Math.random() * listaTareas.length);
+        document.getElementById("fortune").innerHTML = listaTareas[r];
+
+        mostrarCorazonesFlotantes();
+    }
+
+    function mostrarCorazonesFlotantes() {
+        var heartContainer = document.getElementById("heartContainer");
+
+        for (var i = 0; i < 3; i++) {
+            var heart = document.createElement("span");
+            heart.innerHTML = "❤️";
+            heart.classList.add("heart");
+            heart.style.left = Math.random() * window.innerWidth + "px";
+            heart.style.animationDuration = Math.random() * 3 + 2 + "s";
+            heartContainer.appendChild(heart);
+
+            setTimeout(function (heart) {
+                heartContainer.removeChild(heart);
+            }, 5000, heart);
+        }
+    }
+
+    cargarTareas();
+    actualizarTareas();
+</script>
+</body>
+</html>
